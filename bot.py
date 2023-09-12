@@ -38,7 +38,7 @@ async def upload(ctx, file:discord.Attachment, stepartist:discord.SlashCommandOp
             f.close()
             await ctx.respond(file=discord.File(data, f'{ctx.author.id}.{upload_ext}'), content=f'Hi {stepartist}!')
 
-@santa.command(description="LET'S FUCKING GOOOOOOOOOOOOOOOOOO") # TODO: not have this in final
+@santa.command(description="LET'S HECKING GOOOOOOOOOOOOOOOOOO") # TODO: not have this in final
 async def hohoho(ctx):
     print(type(ctx.author.id))
     if (ctx.author.id != 262440960040894474) or (ctx.author.id != 84108714671345664):
