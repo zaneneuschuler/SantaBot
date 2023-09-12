@@ -37,6 +37,7 @@ async def upload(ctx, file:discord.Attachment, stepartist:discord.SlashCommandOp
             f.write(data.getbuffer()) #write datastream to file and close
             f.close()
             await ctx.respond(file=discord.File(data, f'{ctx.author.id}.{upload_ext}'), content=f'Hi {stepartist}!')
+            # TODO: add some form of databasing for users
 
 @santa.command(description="LET'S HECKING GOOOOOOOOOOOOOOOOOO")
 async def hohoho(ctx):
@@ -45,5 +46,6 @@ async def hohoho(ctx):
         await ctx.respond("You're not allowed to start the christmas season!")
     else:
         await ctx.respond("Ho ho ho! Be prepared to get your files...")
+        # TODO: file distribution logic 
 
 bot.run(os.getenv("CLIENT_TOKEN"))
