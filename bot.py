@@ -7,8 +7,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 bot = discord.Bot()
-# TODO: put guilds in .env
-bot_guild_ids = guild_ids=["1150971174805844139"]
+# Guilds go into .env as a string split by spaces
+bot_guild_ids = os.getenv("GUILD_IDS").split(' ')
 
 
 # create Slash Command group with bot.create_group
