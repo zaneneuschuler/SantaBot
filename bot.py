@@ -3,9 +3,18 @@ import aiohttp
 import io
 import os
 import db
+import random
 from dotenv import load_dotenv
 
 load_dotenv()
+
+def testing_function(first, second):
+    for i in range(len(first)):
+        if first[i][0] == second[i][0]:
+            return True
+        else: 
+            pass
+    return False
 
 bot = discord.Bot()
 # Guilds go into .env as a string split by spaces
@@ -50,4 +59,19 @@ async def hohoho(ctx):
         await ctx.respond("Ho ho ho! Be prepared to get your files...")
         # TODO: file distribution logic 
 
+@santa.command(description="For internal testing purposes")
+async def testing(ctx):
+    stepartists = db.get()
+    stepartists_randomized = random.sample(stepartists, len(stepartists))
+    shuffled = testing_function(stepartists,stepartists_randomized)
+    while shuffled:
+        print("Need to reshuffle!") #cursed. will literally not scale well at all.
+        random.shuffle(stepartists_randomized)
+        shuffled = testing_function(stepartists,stepartists_randomized)
+    for i in range(len(stepartists)):
+        await ctx.send(f'Stepartist {stepartists[i][1]} will get {stepartists_randomized[i][1]}\'s file!')
+
+
 bot.run(os.getenv("CLIENT_TOKEN"))
+
+

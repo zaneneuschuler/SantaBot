@@ -14,6 +14,14 @@ def put(discord_id, stepartist):
     else:
         cur.execute("INSERT INTO stepartists VALUES(?, ?)", data)
         db.commit()
-        print("Values added to db:\n")
+        print("Values added to db:")
         print(cur.execute("SELECT * from stepartists").fetchall()[-1])
         db.close()
+
+def get():
+    db = sqlite3.connect("test.db")
+    cur = db.cursor()
+    cur.execute("SELECT * FROM stepartists")
+    fetched = cur.fetchall()
+    db.close()
+    return fetched
