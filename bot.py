@@ -2,6 +2,7 @@ import discord
 import aiohttp
 import io
 import os
+import db
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -37,7 +38,8 @@ async def upload(ctx, file:discord.Attachment, stepartist:discord.SlashCommandOp
             f.write(data.getbuffer()) #write datastream to file and close
             f.close()
             await ctx.respond(file=discord.File(data, f'{ctx.author.id}.{upload_ext}'), content=f'Hi {stepartist}!')
-            # TODO: add some form of databasing for users
+            db.put(ctx.author.id, stepartist)
+            #DB expects author ID and then stepartist name
 
 @santa.command(description="LET'S HECKING GOOOOOOOOOOOOOOOOOO")
 async def hohoho(ctx):
