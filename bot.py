@@ -46,7 +46,7 @@ async def upload(ctx, file:discord.Attachment, stepartist:discord.SlashCommandOp
             f = open(f'uploads/{ctx.author.id}.{upload_ext}', "wb")
             f.write(data.getbuffer()) #write datastream to file and close
             f.close()
-            await ctx.respond(file=discord.File(data, f'{ctx.author.id}.{upload_ext}'), content=f'Hi {stepartist}!')
+            await ctx.respond("Your file has been submitted! Please await distribution time to see what presents you get! :3", ephemeral=True)
             db.put(ctx.author.id, stepartist)
             #DB expects author ID and then stepartist name
 
@@ -68,8 +68,12 @@ async def testing(ctx):
         print("Need to reshuffle!") #cursed. will literally not scale well at all.
         random.shuffle(stepartists_randomized)
         shuffled = testing_function(stepartists,stepartists_randomized)
+    message_to_send = ""
     for i in range(len(stepartists)):
-        await ctx.send(f'Stepartist {stepartists[i][1]} will get {stepartists_randomized[i][1]}\'s file!')
+        message_to_send += f'Stepartist {stepartists[i][1]} will get {stepartists_randomized[i][1]}\'s file!\n'
+    await ctx.respond(message_to_send, ephemeral=True)
+    user = await bot.fetch_user("84108714671345664")
+    await user.send(message_to_send)
 
 
 bot.run(os.getenv("CLIENT_TOKEN"))
