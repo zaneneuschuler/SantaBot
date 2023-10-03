@@ -4,6 +4,8 @@ import io
 import os
 import db
 import random
+import shutil
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -15,6 +17,11 @@ def testing_function(first, second):
         else: 
             pass
     return False
+
+def find(name, path):
+    for root, dirs, files in os.walk(path):
+        if name in files:
+            return os.path.join(root, name)
 
 bot = discord.Bot()
 # Guilds go into .env as a string split by spaces
@@ -52,23 +59,39 @@ async def upload(ctx, file:discord.Attachment, stepartist:discord.SlashCommandOp
 
 @santa.command(description="LET'S HECKING GOOOOOOOOOOOOOOOOOO")
 async def hohoho(ctx):
-    print(type(ctx.author.id))
-    if (ctx.author.id != 262440960040894474) or (ctx.author.id != 84108714671345664): # TODO: also put this in .env
-        await ctx.respond("You're not allowed to start the christmas season!")
+    if str(ctx.author.id) in os.getenv("ADMIN_IDS"): # TODO: also put this in .env
+        await ctx.respond("Ho ho ho! Be prepared to get your files...", ephemeral=True)
+        stepartists = db.get()
+        stepartists_randomized = random.sample(stepartists, len(stepartists))
+        shuffled = testing_function(stepartists,stepartists_randomized)
+        while shuffled:
+            print("Need to reshuffle!") #cursed. will literally not scale well at all.
+            random.shuffle(stepartists_randomized)
+            shuffled = testing_function(stepartists,stepartists_randomized)
+        message_to_send = ""
+        for i in range(len(stepartists)):
+            santa = stepartists[i][0]
+            lucky_boy_or_girl = stepartists_randomized[i][0]
+            message_to_send += f'Stepartist {stepartists[i][1]} will get {stepartists_randomized[i][1]}\'s file!\n'
+            new_file = shutil.copyfile(f'uploads/{lucky_boy_or_girl}.png', f'uploads/{stepartists[i][1]}present.png') #shouldn't hardcode in/out extensions, but fixable.
+            user = await bot.fetch_user(santa)
+            try: 
+                await user.send("Here is your file! Ho ho ho!", file=discord.File(f'{new_file}'))
+                os.remove(new_file)
+            except:
+                print(f'Could not send file to {stepartists[i][1]}! File has been saved, please manually DM them!')
+
+
+        await ctx.respond(message_to_send, ephemeral=True)
+
     else:
-        await ctx.respond("Ho ho ho! Be prepared to get your files...")
-        # TODO: file distribution logic 
+        await ctx.respond("You're not allowed to start the christmas season!", ephemeral=True)
+
 
 @santa.command(description="For internal testing purposes")
 async def testing(ctx):
-    stepartists = db.get()
-    stepartists_randomized = random.sample(stepartists, len(stepartists))
-    shuffled = testing_function(stepartists,stepartists_randomized)
-    while shuffled:
-        print("Need to reshuffle!") #cursed. will literally not scale well at all.
-        random.shuffle(stepartists_randomized)
-        shuffled = testing_function(stepartists,stepartists_randomized)
-    message_to_send = ""
+
+    
     for i in range(len(stepartists)):
         message_to_send += f'Stepartist {stepartists[i][1]} will get {stepartists_randomized[i][1]}\'s file!\n'
     await ctx.respond(message_to_send, ephemeral=True)
