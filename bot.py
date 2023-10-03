@@ -23,6 +23,8 @@ def find(name, path):
         if name in files:
             return os.path.join(root, name)
 
+devs = os.getenv("ADMIN_IDS").strip('][').split(', ') #take devs from ADMIN_IDS in .env and convert to a list of dev ids
+
 bot = discord.Bot()
 # Guilds go into .env as a string split by spaces
 bot_guild_ids = os.getenv("GUILD_IDS").split(' ')
@@ -53,7 +55,7 @@ async def upload(ctx, file:discord.Attachment, stepartist:discord.SlashCommandOp
             f = open(f'uploads/{ctx.author.id}.{upload_ext}', "wb")
             f.write(data.getbuffer()) #write datastream to file and close
             f.close()
-            await ctx.respond("Your file has been submitted! Please await distribution time to see what presents you get! :3", ephemeral=True)
+            await ctx.respond("Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3", ephemeral=True)
             db.put(ctx.author.id, stepartist)
             #DB expects author ID and then stepartist name
 
@@ -76,27 +78,22 @@ async def hohoho(ctx):
             new_file = shutil.copyfile(f'uploads/{lucky_boy_or_girl}.png', f'uploads/{stepartists[i][1]}present.png') #shouldn't hardcode in/out extensions, but fixable.
             user = await bot.fetch_user(santa)
             try: 
-                await user.send("Here is your file! Ho ho ho!", file=discord.File(f'{new_file}'))
+                await user.send(f"Here is your file! If you have any questions/concerns, feel free to message <@{devs[2]}>, and make sure to submit your file when you're done to him as well!  Ho ho ho!", file=discord.File(f'{new_file}'))
                 os.remove(new_file)
             except:
-                print(f'Could not send file to {stepartists[i][1]}! File has been saved, please manually DM them!')
+                ctx.respond(f'Could not send file to {stepartists[i][1]}! File has been saved, please manually DM them!', ephemeral=True)
 
 
         await ctx.respond(message_to_send, ephemeral=True)
 
     else:
-        await ctx.respond("You're not allowed to start the christmas season!", ephemeral=True)
+        await ctx.respond("Oops! You're not allowed to use this command!", ephemeral=True)
 
 
 @santa.command(description="For internal testing purposes")
 async def testing(ctx):
-
     
-    for i in range(len(stepartists)):
-        message_to_send += f'Stepartist {stepartists[i][1]} will get {stepartists_randomized[i][1]}\'s file!\n'
-    await ctx.respond(message_to_send, ephemeral=True)
-    user = await bot.fetch_user("84108714671345664")
-    await user.send(message_to_send)
+    await ctx.respond(f' ', ephemeral=True)
 
 
 bot.run(os.getenv("CLIENT_TOKEN"))
