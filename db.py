@@ -1,7 +1,6 @@
 import sqlite3
 
 
-
 def put(discord_id, stepartist):
     db = sqlite3.connect("test.db")
     cur = db.cursor()
@@ -17,6 +16,7 @@ def put(discord_id, stepartist):
         print("Values added to db:")
         print(cur.execute("SELECT * from stepartists").fetchall()[-1])
         db.close()
+
 
 def get():
     db = sqlite3.connect("test.db")
