@@ -196,7 +196,7 @@ async def help(ctx):
         )
 
         embed.set_footer(
-            text="Built by zaniel for Secret Stepfile Santa!",
+            text="Built by zaniel & Sorae for Secret Stepfile Santa!",
             icon_url="https://zaneis.moe/ss/2023-10-03_14-27_16638.png",
         )
 
