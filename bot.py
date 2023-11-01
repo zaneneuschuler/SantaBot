@@ -63,7 +63,8 @@ async def upload(
             if resp.status != 200:
                 return await ctx.send("Could not download file...")
             data = io.BytesIO(await resp.read())
-            upload_ext = file.url.split(".")[-1]  # grab extension
+            upload_ext = file.url.split(".")[-1].split("?")[0]  # grab extension
+            print(upload_ext)
 
             f = open(f"uploads/{ctx.author.id}.{upload_ext}", "wb")
             f.write(data.getbuffer())  # write datastream to file and close
@@ -75,6 +76,28 @@ async def upload(
             db.put(ctx.author.id, stepartist)
             # DB expects author ID and then stepartist name
 
+@santa.command(description="Upload your finished file!")
+async def submitfinal(
+    ctx, file: discord.Attachment
+):
+    async with aiohttp.ClientSession() as session:
+        async with session.get(
+            file.url
+        ) as resp:  # async grab file from discord's servers
+            if resp.status != 200:
+                return await ctx.send("Could not download file...")
+            data = io.BytesIO(await resp.read())
+            upload_ext = file.url.split(".")[-1].split("?")[0]  # grab extension
+
+            f = open(f"finalpack/{ctx.author.id}.{upload_ext}", "wb")
+            f.write(data.getbuffer())  # write datastream to file and close
+            f.close()
+            await ctx.respond(
+                "Your finished file has been submitted! Please wait for Christmas Day for the full pack release! If you want to make changes to your file, feel free to reupload your file before then! :3",
+                ephemeral=True,
+            )
+# ideally i'd want some sort of system that checks if a santa event is ongoing so that upload and submitfinal can't be used outside of certain time periods, but that's probably for later
+# also todo: probably some system to track people who have submitted files?
 
 @santa.command(description="LET'S HECKING GOOOOOOOOOOOOOOOOOO")
 async def hohoho(ctx):
@@ -117,8 +140,9 @@ async def hohoho(ctx):
         )
 
 
-# @santa.command(description="For internal testing purposes")
-# async def testing(ctx):
+@santa.command(description="For internal testing purposes")
+async def testing(ctx):
+    await ctx.respond(f"wtf ", ephemeral=True)
 
 
 @santa.command(description="How does this bot work?")
@@ -156,7 +180,7 @@ async def help(ctx):
         )
         embed.add_field(
             name="Step 3: Submitting your final files",
-            value="Unfortunately, at this time **SantaBot** is not able to accept your final submissions, so that will still be handled by sending your file to <@262440960040894474>, however in the future we can try to automate that and the pack creation process as well!",
+            value="When you're ready to submit your finished file, type `/santa submitfinal` to get a prompt to upload your file, and your file will be automatically sent to SantaBot for the final pack!",
             inline=True,
         )
         embed.add_field(
