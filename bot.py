@@ -36,17 +36,17 @@ bot_guild_ids = os.getenv("GUILD_IDS").split(" ")
 
 
 # create Slash Command group with bot.create_group
-greetings = bot.create_group("greetings", "Greet people")
+# greetings = bot.create_group("greetings", "Greet people")
 
 
-@greetings.command(description="Hi there!")
-async def hello(ctx):
-    await ctx.respond(f"Hello, {ctx.author}!")
+# @greetings.command(description="Hi there!")
+# async def hello(ctx):
+#     await ctx.respond(f"Hello, {ctx.author}!")
 
 
-@greetings.command(description="Bye there!")
-async def bye(ctx):
-    await ctx.respond(f"Bye, {ctx.author.id}!")
+# @greetings.command(description="Bye there!")
+# async def bye(ctx):
+#     await ctx.respond(f"Bye, {ctx.author.id}!")
 
 
 santa = bot.create_group("santa", "Secret santa things!")
@@ -117,9 +117,8 @@ async def hohoho(ctx):
         )
 
 
-@santa.command(description="For internal testing purposes")
-async def testing(ctx):
-    await ctx.respond(f" ", ephemeral=True)
+# @santa.command(description="For internal testing purposes")
+# async def testing(ctx):
 
 
 @santa.command(description="How does this bot work?")
@@ -147,7 +146,7 @@ async def help(ctx):
         )
         embed.add_field(
             name="Step 1: Submission",
-            value="Once you have your file(s) prepared, type in `/santa upload` in your discord messaging bar! This will open a prompt for you to upload your file, and your stepartist name! Then all you have to do is submit it, and that's it! It will be recieved by SantaBot immediately (as soon as it uploads).",
+            value="Once you have your file(s) prepared, type in `/santa upload` in your discord messaging bar! This will open a prompt for you to upload your file, and your stepartist name! Then all you have to do is submit it, and that's it! It will be recieved by SantaBot immediately (as soon as it uploads). See the below image for a handy guide!",
             inline=True,
         )
         embed.add_field(
@@ -166,12 +165,21 @@ async def help(ctx):
             inline=False,
         )
 
+        embed.set_image(
+            url="https://zaneis.moe/ss/2023-10-30_15-30_16844.png"
+        )
+
         embed.set_footer(
-            text="Built by zaniel & sorae for Secret Stepfile Santa!",
+            text="Built by zaniel for Secret Stepfile Santa!",
             icon_url="https://zaneis.moe/ss/2023-10-03_14-27_16638.png",
         )
 
-        await ctx.respond(embed=embed)
+        await ctx.send(embed=embed)
+        await ctx.respond("Info message sent!", ephemeral=True)
+    else:
+        await ctx.respond(
+            "Oops! You're not allowed to use this command!", ephemeral=True
+        )
 
 
 bot.run(os.getenv("CLIENT_TOKEN"))
