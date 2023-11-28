@@ -23,5 +23,6 @@ def get():
     cur = db.cursor()
     cur.execute("SELECT * FROM stepartists")
     fetched = cur.fetchall()
+    print(type(fetched))
     db.close()
     return fetched

@@ -114,7 +114,7 @@ async def hohoho(ctx):
             shuffled = testing_function(stepartists, stepartists_randomized)
         message_to_send = ""
         for i in range(len(stepartists)):
-            santa = stepartists[i][0]
+            santa = stepartists[i][0]    
             lucky_boy_or_girl = stepartists_randomized[i][0]
             message_to_send += f"Stepartist {stepartists[i][1]} will get {stepartists_randomized[i][1]}'s file!\n"
             new_file = shutil.copyfile(
@@ -125,17 +125,17 @@ async def hohoho(ctx):
             try:
                 await user.send(
                     f"Here is your file! If you have any questions/concerns, feel free to message <@{devs[2]}>, and make sure to submit your file when you're done to him as well!  Ho ho ho!",
-                    file=discord.File(f"{new_file}"),
+                    file=discord.File(new_file),
                 )
                 os.remove(new_file)
-            except:
-                ctx.respond(
+            except Exception as error:
+               print("Oh no! That's not good! Here's the error:", error)
+               await ctx.respond(
                     f"Could not send file to {stepartists[i][1]}! File has been saved, please manually DM them!",
                     ephemeral=True,
                 )
 
-        await ctx.respond(message_to_send, ephemeral=True)
-
+        print(message_to_send)
     else:
         await ctx.respond(
             "Oops! You're not allowed to use this command!", ephemeral=True
@@ -144,7 +144,24 @@ async def hohoho(ctx):
 
 @santa.command(description="For internal testing purposes")
 async def testing(ctx):
-    await ctx.respond(f"wtf ", ephemeral=True)
+    if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
+        stepartists = db.get()
+        message = "Stepartists currently signed up: \n"
+        for i in range(len(stepartists)):
+            current = stepartists[i][0]
+            message = message + f'<@{current}> \n'
+        await ctx.respond(message, ephemeral=True)
+    else:
+        await ctx.respond("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg", ephemeral=True)
+
+@santa.command(description="For internal testing purposes")
+async def manualadd(ctx, stepartist: discord.SlashCommandOptionType.string, discord_id: discord.SlashCommandOptionType.string):
+    if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
+        db.put(discord_id, stepartist) #Hey, this is really unsafe since the command accepts a string for the discord ID, meaning that theoretically a sql injection could happen.
+        #But I mean, hopefully none of the devs want to do something like that, right?
+        await ctx.respond("did thing", ephemeral=True)
+    else:
+        await ctx.respond("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg", ephemeral=True)
 
 
 @santa.command(description="How does this bot work?")
