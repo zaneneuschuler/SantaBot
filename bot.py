@@ -124,9 +124,9 @@ async def hohoho(ctx):
             user = await bot.fetch_user(santa)
             try:
                 await user.send(
-                    f"Here is your file! If you have any questions/concerns, feel free to message <@{devs[2]}>, and make sure to submit your file when you're done to him as well!  Ho ho ho!",
+                    f"Here is your file! If you have any questions/concerns, feel free to message <@{devs[0]}>, and make sure to submit your file when you're done to him as well!  Ho ho ho!",
                     file=discord.File(new_file),
-                )
+                )#In memory of devs[2]. Good job Zane.
                 os.remove(new_file)
             except Exception as error:
                print("Oh no! That's not good! Here's the error:", error)
