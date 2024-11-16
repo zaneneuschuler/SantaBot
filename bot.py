@@ -34,6 +34,9 @@ bot = discord.Bot()
 # Guilds go into .env as a string split by spaces
 bot_guild_ids = os.getenv("GUILD_IDS").split(" ")
 
+#get db from .env
+bot_db = os.getenv("DB")
+
 
 # create Slash Command group with bot.create_group
 # greetings = bot.create_group("greetings", "Greet people")
@@ -73,7 +76,7 @@ async def upload(
                 "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
                 ephemeral=True,
             )
-            db.put(ctx.author.id, stepartist)
+            db.put(ctx.author.id, stepartist, bot_db)
             # DB expects author ID and then stepartist name
 
 @santa.command(description="Upload your finished file! (for future events)")
@@ -105,7 +108,7 @@ async def submitfinal(
 async def hohoho(ctx):
     if str(ctx.author.id) in os.getenv("ADMIN_IDS"):  # TODO: also put this in .env
         await ctx.respond("Ho ho ho! Be prepared to get your files...", ephemeral=True)
-        stepartists = db.get()
+        stepartists = db.get(bot_db)
         stepartists_randomized = random.sample(stepartists, len(stepartists))
         shuffled = testing_function(stepartists, stepartists_randomized)
         while shuffled:
@@ -145,7 +148,7 @@ async def hohoho(ctx):
 @santa.command(description="For internal testing purposes")
 async def testing(ctx):
     if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
-        stepartists = db.get()
+        stepartists = db.get(bot_db)
         message = "Stepartists currently signed up: \n"
         for i in range(len(stepartists)):
             current = stepartists[i][0]
@@ -155,9 +158,18 @@ async def testing(ctx):
         await ctx.respond("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg", ephemeral=True)
 
 @santa.command(description="For internal testing purposes")
+async def wipe(ctx):
+    if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
+        db.wipe(bot_db)
+        await ctx.respond(f"Database has been wiped! Make sure to doublecheck {bot_db} to make sure though!", ephemeral=True)
+    else:
+        await ctx.respond("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg", ephemeral=True)
+
+
+@santa.command(description="For internal testing purposes")
 async def manualadd(ctx, stepartist: discord.SlashCommandOptionType.string, discord_id: discord.SlashCommandOptionType.string):
     if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
-        db.put(discord_id, stepartist) #Hey, this is really unsafe since the command accepts a string for the discord ID, meaning that theoretically a sql injection could happen.
+        db.put(discord_id, stepartist, bot_db) #Hey, this is really unsafe since the command accepts a string for the discord ID, meaning that theoretically a sql injection could happen.
         #But I mean, hopefully none of the devs want to do something like that, right?
         await ctx.respond("did thing", ephemeral=True)
     else:
