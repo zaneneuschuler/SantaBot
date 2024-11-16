@@ -4,3 +4,6 @@
 *.db
 __pycache__/
 /.vscode
+*.txt
+*.zip
+!requirements.txt

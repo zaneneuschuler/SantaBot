@@ -137,7 +137,9 @@ async def hohoho(ctx):
                     f"Could not send file to {stepartists[i][1]}! File has been saved, please manually DM them!",
                     ephemeral=True,
                 )
-
+        f = open("matches.txt", "w")
+        f.write(message_to_send)
+        f.close()
         print(message_to_send)
     else:
         await ctx.respond(
