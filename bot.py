@@ -5,6 +5,8 @@ import os
 import db
 import random
 import shutil
+import gdown
+import dropbox
 
 from dotenv import load_dotenv
 
@@ -37,27 +39,51 @@ bot_guild_ids = os.getenv("GUILD_IDS").split(" ")
 #get db from .env
 bot_db = os.getenv("DB")
 
-
-# create Slash Command group with bot.create_group
-# greetings = bot.create_group("greetings", "Greet people")
-
-
-# @greetings.command(description="Hi there!")
-# async def hello(ctx):
-#     await ctx.respond(f"Hello, {ctx.author}!")
-
-
-# @greetings.command(description="Bye there!")
-# async def bye(ctx):
-#     await ctx.respond(f"Bye, {ctx.author.id}!")
-
+# get dropbox token from .env. dropboxb
+dbx_token = os.getenv("DBX_TOKEN")
+dbx = dropbox.Dropbox(dbx_token)
 
 santa = bot.create_group("santa", "Secret santa things!")
 
+@santa.command(description="Link upload via MEGA or gdrive")
+async def linkupload(
+    ctx, 
+    url: discord.Option(discord.SlashCommandOptionType.string, "Google Drive or Dropbox link to ONE .zip file with your simfile skeletons"), # type: ignore
+    stepartist: discord.Option(discord.SlashCommandOptionType.string, "Your stepartist name") # type: ignore
+):
+    try:
+        uploadsPath = os.path.join(os.path.dirname(__file__), "./uploads")
+        if not os.path.exists(uploadsPath):
+            os.makedirs(uploadsPath)
+
+        if "drive.google.com" in url:
+            await ctx.defer() # gdown takes a while to download, defer so discord doesn't yell at us for not responding
+            gdown.download(url = url, output = f"./uploads/{ctx.author.id}.zip", fuzzy = True) # this should probably not be hardcoded as .zip... dunno what to do here lol
+            db.put(ctx.author.id, stepartist, bot_db)
+            await ctx.respond(
+                "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
+                ephemeral=True,
+            )
+
+        elif "dropbox.com" in url:
+            await ctx.defer()
+            print(f"Downloading from Dropbox link: {url}")
+            dbx.sharing_get_shared_link_file_to_file(f"./uploads/{ctx.author.id}.zip", url, path = None, link_password = None) # dropbox sdk u suck big balls
+            db.put(ctx.author.id, stepartist, bot_db)
+            await ctx.respond(
+                "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
+                ephemeral=True,
+            )
+        else:
+            await ctx.respond("This is not a valid Google Drive or Dropbox link! Please try again.")
+    except Exception as e: 
+        await ctx.respond(f"Something went wrong! Check to make sure your Google Drive or Dropbox links are public. Please try again or contact the admins. {e}", ephemeral = True)
 
 @santa.command(description="Upload your skeleton!")
 async def upload(
-    ctx, file: discord.Attachment, stepartist: discord.SlashCommandOptionType.string
+    ctx, 
+    file: discord.Option(discord.Attachment, "ONE .zip file with your simfile skeletons"), # type: ignore
+    stepartist: discord.Option(discord.SlashCommandOptionType.string, "Your stepartist name") # type: ignore
 ):
     async with aiohttp.ClientSession() as session:
         async with session.get(
