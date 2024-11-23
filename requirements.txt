@@ -1,3 +1,5 @@
 py-cord
 python-dotenv
 aiohttp
+gdown
+dropbox
