@@ -207,58 +207,61 @@ async def manualadd(ctx, stepartist: discord.SlashCommandOptionType.string, disc
 @santa.command(description="How does this bot work?")
 async def help(ctx):
     if str(ctx.author.id) in os.getenv("ADMIN_IDS"): 
-        embed = discord.Embed(
-            title="Read me!",
-            description="Hi there! Starting Secret Stepfile Santa 2023, we are proud to introduce to you ***SantaBot***! **SantaBot** has been made in order to make the entire Secret Santa Process generally be a lot more streamlined than in the past, and hopefully can be used for many years in the future!",
-            colour=0xF50000,
-        )
+        try:
+            embed = discord.Embed(
+                title="Read me!",
+                description="Hi there! Starting Secret Stepfile Santa 2023, we are proud to introduce to you ***SantaBot***! **SantaBot** has been made in order to make the entire Secret Santa Process generally be a lot more streamlined than in the past, and hopefully can be used for many years in the future!",
+                colour=0xF50000,
+            )
 
-        embed.set_author(
-            name="SantaBot", icon_url="https://zaneis.moe/ss/2023-10-03_14-27_16638.png"
-        )
+            embed.set_author(
+                name="SantaBot", icon_url="https://zaneis.moe/ss/2023-10-03_14-27_16638.png"
+            )
 
-        embed.add_field(
-            name="So what does this mean?",
-            value="Starting 2023, **SantaBot** will be the main way to submit and receive files! This might seem a little scary, but we have a handy guide for you to help you through the new Secret Santa experience!",
-            inline=False,
-        )
-        embed.add_field(
-            name="Step 0: Preparation",
-            value="Once <@262440960040894474> announces that submissions are open, make sure to have your file in a *.zip* folder! This will make it much easier for us to handle. Along with this, ***please*** have DMs from server members open! If you do not do this, we will be unable to automatically send you your gifts!",
-            inline=True,
-        )
-        embed.add_field(
-            name="Step 1: Submission",
-            value="Once you have your file(s) prepared, type in `/santa upload` in your discord messaging bar! This will open a prompt for you to upload your file, and your stepartist name! Then all you have to do is submit it, and that's it! It will be recieved by SantaBot immediately (as soon as it uploads). See the below image for a handy guide!",
-            inline=True,
-        )
-        embed.add_field(
-            name="Step 2: Receiving your file",
-            value="Once the distribution day comes, <@262440960040894474> or <@84108714671345664> will pull the magic lever (okay it's another command), and the bot will automatically choose your partner, and give you their files! The *entire* distribution process has been automated!",
-            inline=True,
-        )
-        embed.add_field(
-            name="Step 3: Submitting your final files",
-            value="Unfortunately, at this time **SantaBot** ~~is not able to accept your final submissions~~ won't be used for recieving final files, so that will still be handled by sending your file to <@262440960040894474>, however in the future we can try to automate that and the pack creation process as well!",
-            inline=True,
-        )
-        embed.add_field(
-            name="Still have questions?",
-            value="Please mention <@84108714671345664>, and he will try to answer your questions to the best of his ability!",
-            inline=False,
-        )
+            embed.add_field(
+                name="So what does this mean?",
+                value="Starting 2023, **SantaBot** will be the main way to submit and receive files! This might seem a little scary, but we have a handy guide for you to help you through the new Secret Santa experience!",
+                inline=False,
+            )
+            embed.add_field(
+                name="Step 0: Preparation",
+                value="Once <@262440960040894474> announces that submissions are open, make sure to have your file in a *.zip* folder! This will make it much easier for us to handle. Along with this, ***please*** have DMs from server members open! If you do not do this, we will be unable to automatically send you your gifts!",
+                inline=False,
+            )
+            embed.add_field(
+                name="Step 1: Submission",
+                value="Once you have your file(s) prepared, type in `/santa upload` in your discord messaging bar! This will open a prompt for you to upload your file, and your stepartist name! Then all you have to do is submit it, and that's it! It will be recieved by SantaBot immediately (as soon as it uploads). Alternatively, if you are unable to upload directly to discord, upload to Google Drive or Dropbox! See the below image for a handy guide!",
+                inline=False,
+            )
+            embed.add_field(
+                name="Step 2: Receiving your file",
+                value="Once the distribution day comes, <@262440960040894474> or <@84108714671345664> will pull the magic lever (okay it's another command), and the bot will automatically choose your partner, and give you their files! The *entire* distribution process has been automated!",
+                inline=False,
+            )
+            embed.add_field(
+                name="Step 3: Submitting your final files",
+                value="Please send your final file(s) to <@262440960040894474>, and look forward to your presents!",
+                inline=False,
+            )
+            embed.add_field(
+                name="Still have questions?",
+                value="Please mention <@84108714671345664>, and he will try to answer your questions to the best of his ability!",
+                inline=False,
+            )
 
-        embed.set_image(
-            url="https://zaneis.moe/ss/2023-10-30_15-30_16844.png"
-        )
+            embed.set_image(
+                url="https://zaneis.moe/ss/2024-11-23_21-09_20623.png"
+            )
 
-        embed.set_footer(
-            text="Built by zaniel & Sorae for Secret Stepfile Santa!",
-            icon_url="https://zaneis.moe/ss/2023-10-03_14-27_16638.png",
-        )
+            embed.set_footer(
+                text="Built by zaniel & Sorae for Secret Stepfile Santa!",
+                icon_url="https://zaneis.moe/ss/2023-10-03_14-27_16638.png",
+            )
 
-        await ctx.send(embed=embed)
-        await ctx.respond("Info message sent!", ephemeral=True)
+            await ctx.send(embed=embed)
+            await ctx.respond("Info message sent!", ephemeral=True)
+        except discord.errors.ApplicationCommandInvokeError:
+            ctx.respond("Hey, I'm not allowed to post in this channel! You should fix that!", ephemeral=True)
     else:
         await ctx.respond(
             "Oops! You're not allowed to use this command!", ephemeral=True
