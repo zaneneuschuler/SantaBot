@@ -45,7 +45,7 @@ dbx = dropbox.Dropbox(dbx_token)
 
 santa = bot.create_group("santa", "Secret santa things!")
 
-@santa.command(description="Link upload via MEGA or gdrive")
+@santa.command(description="Link upload via Dropbox or gdrive")
 async def linkupload(
     ctx, 
     url: discord.Option(discord.SlashCommandOptionType.string, "Google Drive or Dropbox link to ONE .zip file with your simfile skeletons"), # type: ignore
