@@ -40,8 +40,11 @@ bot_guild_ids = os.getenv("GUILD_IDS").split(" ")
 bot_db = os.getenv("DB")
 
 # get dropbox token from .env. dropboxb
-dbx_token = os.getenv("DBX_TOKEN")
-dbx = dropbox.Dropbox(dbx_token)
+try:
+    dbx_token = os.getenv("DBX_TOKEN")
+    dbx = dropbox.Dropbox(dbx_token)
+except:
+    dbx = None
 
 santa = bot.create_group("santa", "Secret santa things!")
 
@@ -66,16 +69,19 @@ async def linkupload(
             )
 
         elif "dropbox.com" in url:
-            await ctx.defer()
-            print(f"Downloading from Dropbox link: {url}")
-            dbx.sharing_get_shared_link_file_to_file(f"./uploads/{ctx.author.id}.zip", url, path = None, link_password = None) # dropbox sdk u suck big balls
-            db.put(ctx.author.id, stepartist, bot_db)
-            await ctx.respond(
-                "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
-                ephemeral=True,
-            )
+            if dbx != None:
+                await ctx.defer()
+                print(f"Downloading from Dropbox link: {url}")
+                dbx.sharing_get_shared_link_file_to_file(f"./uploads/{ctx.author.id}.zip", url, path = None, link_password = None) # dropbox sdk u suck big balls
+                db.put(ctx.author.id, stepartist, bot_db)
+                await ctx.respond(
+                    "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
+                    ephemeral=True,
+                )
+            else:
+                await ctx.respond("Unfortunately the bot currently does not currently support Dropbox downloading! If you would like to use dropbox, please message whoever is running this bot instance to follow the directions [here](https://github.com/zaneneuschuler/SantaBot).", ephemeral=True)
         else:
-            await ctx.respond("This is not a valid Google Drive or Dropbox link! Please try again.")
+            await ctx.respond("This is not a valid Google Drive or Dropbox link! Please try again.", ephemeral=True)
     except Exception as e: 
         await ctx.respond(f"Something went wrong! Check to make sure your Google Drive or Dropbox links are public. Please try again or contact the admins. {e}", ephemeral = True)
 
