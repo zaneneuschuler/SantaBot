@@ -12,6 +12,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+def get_download_link(URL):
+    file_id = URL.split('/')[-2]
+    download_link = f"https://drive.google.com/uc?id={file_id}"
+    return download_link
+
 
 def testing_function(first, second):
     for i in range(len(first)):
@@ -55,17 +60,18 @@ async def linkupload(
     stepartist: discord.Option(discord.SlashCommandOptionType.string, "Your stepartist name") # type: ignore
 ):
     try:
+        url = get_download_link(url)
         uploadsPath = os.path.join(os.path.dirname(__file__), "./uploads")
         if not os.path.exists(uploadsPath):
             os.makedirs(uploadsPath)
 
         if "drive.google.com" in url:
             await ctx.defer() # gdown takes a while to download, defer so discord doesn't yell at us for not responding
-            gdown.download(url = url, output = f"./uploads/{ctx.author.id}.zip", fuzzy = True) # this should probably not be hardcoded as .zip... dunno what to do here lol
+            gdown.download(url = url, output = f"./uploads/{ctx.author.id}.zip") # this should probably not be hardcoded as .zip... dunno what to do here lol
             db.put(ctx.author.id, stepartist, bot_db)
             await ctx.respond(
-                "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
-                ephemeral=True,
+                "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3"
+            , ephemeral=True
             )
 
         elif "dropbox.com" in url:
@@ -74,15 +80,15 @@ async def linkupload(
                 print(f"Downloading from Dropbox link: {url}")
                 dbx.sharing_get_shared_link_file_to_file(f"./uploads/{ctx.author.id}.zip", url, path = None, link_password = None) # dropbox sdk u suck big balls
                 db.put(ctx.author.id, stepartist, bot_db)
-                await ctx.respond(
+                await ctx.followup(
                     "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
-                    ephemeral=True,
                 )
             else:
                 await ctx.respond("Unfortunately the bot currently does not currently support Dropbox downloading! If you would like to use dropbox, please message whoever is running this bot instance to follow the directions [here](https://github.com/zaneneuschuler/SantaBot).", ephemeral=True)
         else:
             await ctx.respond("This is not a valid Google Drive or Dropbox link! Please try again.", ephemeral=True)
     except Exception as e: 
+        print(e)
         await ctx.respond(f"Something went wrong! Check to make sure your Google Drive or Dropbox links are public. Please try again or contact the admins. {e}", ephemeral = True)
 
 @santa.command(description="Upload your skeleton!")
@@ -106,7 +112,7 @@ async def upload(
             f.close()
             await ctx.respond(
                 "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
-                ephemeral=True,
+                ephemeral=True
             )
             db.put(ctx.author.id, stepartist, bot_db)
             # DB expects author ID and then stepartist name

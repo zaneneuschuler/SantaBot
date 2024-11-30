@@ -11,7 +11,7 @@ def put(discord_id, stepartist, database):
         init(db)
     result = cur.fetchone()
     if result:
-        print("User already in database! Skipping...")
+        print(f"User {stepartist} already in database! Skipping...")
         db.close()
     else:
         cur.execute("INSERT INTO stepartists VALUES(?, ?)", data)
