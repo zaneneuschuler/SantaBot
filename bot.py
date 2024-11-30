@@ -12,8 +12,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 def get_download_link(URL):
-    file_id = URL.split('/')[-2]
+    file_id = URL.split("/")[-2]
     download_link = f"https://drive.google.com/uc?id={file_id}"
     return download_link
 
@@ -41,7 +42,7 @@ bot = discord.Bot()
 # Guilds go into .env as a string split by spaces
 bot_guild_ids = os.getenv("GUILD_IDS").split(" ")
 
-#get db from .env
+# get db from .env
 bot_db = os.getenv("DB")
 
 # get dropbox token from .env. dropboxb
@@ -53,11 +54,12 @@ except:
 
 santa = bot.create_group("santa", "Secret santa things!")
 
+
 @santa.command(description="Link upload via Dropbox or gdrive")
 async def linkupload(
-    ctx, 
-    url: discord.Option(discord.SlashCommandOptionType.string, "Google Drive or Dropbox link to ONE .zip file with your simfile skeletons"), # type: ignore
-    stepartist: discord.Option(discord.SlashCommandOptionType.string, "Your stepartist name") # type: ignore
+    ctx,
+    url: discord.Option(discord.SlashCommandOptionType.string, "Google Drive or Dropbox link to ONE .zip file with your simfile skeletons"),  # type: ignore
+    stepartist: discord.Option(discord.SlashCommandOptionType.string, "Your stepartist name"),  # type: ignore
 ):
     try:
         url = get_download_link(url)
@@ -66,36 +68,51 @@ async def linkupload(
             os.makedirs(uploadsPath)
 
         if "drive.google.com" in url:
-            await ctx.defer() # gdown takes a while to download, defer so discord doesn't yell at us for not responding
-            gdown.download(url = url, output = f"./uploads/{ctx.author.id}.zip") # this should probably not be hardcoded as .zip... dunno what to do here lol
+            await ctx.defer()  # gdown takes a while to download, defer so discord doesn't yell at us for not responding
+            gdown.download(
+                url=url, output=f"./uploads/{ctx.author.id}.zip"
+            )  # this should probably not be hardcoded as .zip... dunno what to do here lol
             db.put(ctx.author.id, stepartist, bot_db)
             await ctx.respond(
-                "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3"
-            , ephemeral=True
+                "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
+                ephemeral=True,
             )
 
         elif "dropbox.com" in url:
             if dbx != None:
                 await ctx.defer()
                 print(f"Downloading from Dropbox link: {url}")
-                dbx.sharing_get_shared_link_file_to_file(f"./uploads/{ctx.author.id}.zip", url, path = None, link_password = None) # dropbox sdk u suck big balls
+                dbx.sharing_get_shared_link_file_to_file(
+                    f"./uploads/{ctx.author.id}.zip", url, path=None, link_password=None
+                )  # dropbox sdk u suck big balls
                 db.put(ctx.author.id, stepartist, bot_db)
                 await ctx.followup(
                     "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
+                    ephemeral=True,
                 )
             else:
-                await ctx.respond("Unfortunately the bot currently does not currently support Dropbox downloading! If you would like to use dropbox, please message whoever is running this bot instance to follow the directions [here](https://github.com/zaneneuschuler/SantaBot).", ephemeral=True)
+                await ctx.respond(
+                    "Unfortunately the bot currently does not currently support Dropbox downloading! If you would like to use dropbox, please message whoever is running this bot instance to follow the directions [here](https://github.com/zaneneuschuler/SantaBot).",
+                    ephemeral=True,
+                )
         else:
-            await ctx.respond("This is not a valid Google Drive or Dropbox link! Please try again.", ephemeral=True)
-    except Exception as e: 
+            await ctx.respond(
+                "This is not a valid Google Drive or Dropbox link! Please try again.",
+                ephemeral=True,
+            )
+    except Exception as e:
         print(e)
-        await ctx.respond(f"Something went wrong! Check to make sure your Google Drive or Dropbox links are public. Please try again or contact the admins. {e}", ephemeral = True)
+        await ctx.respond(
+            f"Something went wrong! Check to make sure your Google Drive or Dropbox links are public. Please try again or contact the admins. {e}",
+            ephemeral=True,
+        )
+
 
 @santa.command(description="Upload your skeleton!")
 async def upload(
-    ctx, 
-    file: discord.Option(discord.Attachment, "ONE .zip file with your simfile skeletons"), # type: ignore
-    stepartist: discord.Option(discord.SlashCommandOptionType.string, "Your stepartist name") # type: ignore
+    ctx,
+    file: discord.Option(discord.Attachment, "ONE .zip file with your simfile skeletons"),  # type: ignore
+    stepartist: discord.Option(discord.SlashCommandOptionType.string, "Your stepartist name"),  # type: ignore
 ):
     async with aiohttp.ClientSession() as session:
         async with session.get(
@@ -112,15 +129,14 @@ async def upload(
             f.close()
             await ctx.respond(
                 "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
-                ephemeral=True
+                ephemeral=True,
             )
             db.put(ctx.author.id, stepartist, bot_db)
             # DB expects author ID and then stepartist name
 
+
 @santa.command(description="Upload your finished file! (for future events)")
-async def submitfinal(
-    ctx, file: discord.Attachment
-):
+async def submitfinal(ctx, file: discord.Attachment):
     if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
         async with aiohttp.ClientSession() as session:
             async with session.get(
@@ -139,8 +155,14 @@ async def submitfinal(
                     ephemeral=True,
                 )
     else:
-        ctx.respond("Sorry! For 2023, all files must be submitted directly to ATB. Maybe next year!", ephemeral=True)
+        ctx.respond(
+            "Sorry! For 2023, all files must be submitted directly to ATB. Maybe next year!",
+            ephemeral=True,
+        )
+
+
 # ideally i'd want some sort of system that checks if a santa event is ongoing so that upload and submitfinal can't be used outside of certain time periods, but that's probably for later
+
 
 @santa.command(description="LET'S HECKING GOOOOOOOOOOOOOOOOOO")
 async def hohoho(ctx):
@@ -155,7 +177,7 @@ async def hohoho(ctx):
             shuffled = testing_function(stepartists, stepartists_randomized)
         message_to_send = ""
         for i in range(len(stepartists)):
-            santa = stepartists[i][0]    
+            santa = stepartists[i][0]
             lucky_boy_or_girl = stepartists_randomized[i][0]
             message_to_send += f"Stepartist {stepartists[i][1]} will get {stepartists_randomized[i][1]}'s file!\n"
             new_file = shutil.copyfile(
@@ -167,11 +189,11 @@ async def hohoho(ctx):
                 await user.send(
                     f"Here is your file! If you have any questions/concerns, feel free to message <@{devs[0]}>, and make sure to submit your file when you're done to him as well!  Ho ho ho!",
                     file=discord.File(new_file),
-                )#In memory of devs[2]. Good job Zane.
+                )  # In memory of devs[2]. Good job Zane.
                 os.remove(new_file)
             except Exception as error:
-               print("Oh no! That's not good! Here's the error:", error)
-               await ctx.respond(
+                print("Oh no! That's not good! Here's the error:", error)
+                await ctx.respond(
                     f"Could not send file to {stepartists[i][1]}! File has been saved, please manually DM them!",
                     ephemeral=True,
                 )
@@ -192,33 +214,52 @@ async def testing(ctx):
         message = "Stepartists currently signed up: \n"
         for i in range(len(stepartists)):
             current = stepartists[i][0]
-            message = message + f'<@{current}> \n'
+            message = message + f"<@{current}> \n"
         await ctx.respond(message, ephemeral=True)
     else:
-        await ctx.respond("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg", ephemeral=True)
+        await ctx.respond(
+            "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg",
+            ephemeral=True,
+        )
+
 
 @santa.command(description="For internal testing purposes")
 async def wipe(ctx):
     if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
         db.wipe(bot_db)
-        await ctx.respond(f"Database has been wiped! Make sure to doublecheck {bot_db} to make sure though!", ephemeral=True)
+        await ctx.respond(
+            f"Database has been wiped! Make sure to doublecheck {bot_db} to make sure though!",
+            ephemeral=True,
+        )
     else:
-        await ctx.respond("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg", ephemeral=True)
+        await ctx.respond(
+            "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg",
+            ephemeral=True,
+        )
 
 
 @santa.command(description="For internal testing purposes")
-async def manualadd(ctx, stepartist: discord.SlashCommandOptionType.string, discord_id: discord.SlashCommandOptionType.string):
+async def manualadd(
+    ctx,
+    stepartist: discord.SlashCommandOptionType.string,
+    discord_id: discord.SlashCommandOptionType.string,
+):
     if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
-        db.put(discord_id, stepartist, bot_db) #Hey, this is really unsafe since the command accepts a string for the discord ID, meaning that theoretically a sql injection could happen.
-        #But I mean, hopefully none of the devs want to do something like that, right?
+        db.put(
+            discord_id, stepartist, bot_db
+        )  # Hey, this is really unsafe since the command accepts a string for the discord ID, meaning that theoretically a sql injection could happen.
+        # But I mean, hopefully none of the devs want to do something like that, right?
         await ctx.respond("did thing", ephemeral=True)
     else:
-        await ctx.respond("https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg", ephemeral=True)
+        await ctx.respond(
+            "https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/apps/1421490/5a9ac5aa850e5638527ab0fae7c4983f63f9c3e6.jpg",
+            ephemeral=True,
+        )
 
 
 @santa.command(description="How does this bot work?")
 async def help(ctx):
-    if str(ctx.author.id) in os.getenv("ADMIN_IDS"): 
+    if str(ctx.author.id) in os.getenv("ADMIN_IDS"):
         try:
             embed = discord.Embed(
                 title="Read me!",
@@ -227,7 +268,8 @@ async def help(ctx):
             )
 
             embed.set_author(
-                name="SantaBot", icon_url="https://zaneis.moe/ss/2023-10-03_14-27_16638.png"
+                name="SantaBot",
+                icon_url="https://zaneis.moe/ss/2023-10-03_14-27_16638.png",
             )
 
             embed.add_field(
@@ -261,9 +303,7 @@ async def help(ctx):
                 inline=False,
             )
 
-            embed.set_image(
-                url="https://zaneis.moe/ss/2024-11-23_21-09_20623.png"
-            )
+            embed.set_image(url="https://zaneis.moe/ss/2024-11-23_21-09_20623.png")
 
             embed.set_footer(
                 text="Built by zaniel & Sorae for Secret Stepfile Santa!",
@@ -273,7 +313,10 @@ async def help(ctx):
             await ctx.send(embed=embed)
             await ctx.respond("Info message sent!", ephemeral=True)
         except discord.errors.ApplicationCommandInvokeError:
-            ctx.respond("Hey, I'm not allowed to post in this channel! You should fix that!", ephemeral=True)
+            ctx.respond(
+                "Hey, I'm not allowed to post in this channel! You should fix that!",
+                ephemeral=True,
+            )
     else:
         await ctx.respond(
             "Oops! You're not allowed to use this command!", ephemeral=True
