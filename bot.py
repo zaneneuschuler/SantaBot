@@ -68,19 +68,19 @@ async def linkupload(
             os.makedirs(uploadsPath)
 
         if "drive.google.com" in url:
-            await ctx.defer()  # gdown takes a while to download, defer so discord doesn't yell at us for not responding
+            await ctx.defer(ephemeral=True)  # gdown takes a while to download, defer so discord doesn't yell at us for not responding
             gdown.download(
                 url=url, output=f"./uploads/{ctx.author.id}.zip"
             )  # this should probably not be hardcoded as .zip... dunno what to do here lol
             db.put(ctx.author.id, stepartist, bot_db)
             await ctx.respond(
                 "Your file has been submitted! Please await distribution time to see what presents you get! If you want to make changes to your file, feel free to reupload your file! :3",
-                ephemeral=True,
+ephemeral=True,
             )
 
         elif "dropbox.com" in url:
             if dbx != None:
-                await ctx.defer()
+                await ctx.defer(ephemeral=True)
                 print(f"Downloading from Dropbox link: {url}")
                 dbx.sharing_get_shared_link_file_to_file(
                     f"./uploads/{ctx.author.id}.zip", url, path=None, link_password=None
